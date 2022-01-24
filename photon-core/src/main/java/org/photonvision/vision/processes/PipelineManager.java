@@ -32,8 +32,10 @@ public class PipelineManager {
 
     public static final int DRIVERMODE_INDEX = -1;
     public static final int CAL_3D_INDEX = -2;
+    public static final int PYTHON_INDEX = -3;
 
     protected final List<CVPipelineSettings> userPipelineSettings;
+    protected final PythonPipeline pythonPipeline = new PythonPipeline();
     protected final Calibrate3dPipeline calibration3dPipeline = new Calibrate3dPipeline();
     protected final DriverModePipeline driverModePipeline = new DriverModePipeline();
 
@@ -79,6 +81,8 @@ public class PipelineManager {
     public CVPipelineSettings getPipelineSettings(int index) {
         if (index < 0) {
             switch (index) {
+                case PYTHON_INDEX:
+                    return pythonPipeline.getSettings();
                 case DRIVERMODE_INDEX:
                     return driverModePipeline.getSettings();
                 case CAL_3D_INDEX:
@@ -126,6 +130,8 @@ public class PipelineManager {
                     return calibration3dPipeline;
                 case DRIVERMODE_INDEX:
                     return driverModePipeline;
+                case PYTHON_INDEX:
+                    return pythonPipeline;
             }
         }
 

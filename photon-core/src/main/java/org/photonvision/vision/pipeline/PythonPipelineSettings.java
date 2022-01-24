@@ -17,19 +17,19 @@
 
 package org.photonvision.vision.pipeline;
 
-@SuppressWarnings("rawtypes")
-public enum PipelineType {
-    Python(-3, PythonPipeline.class),
-    Calib3d(-2, Calibrate3dPipeline.class),
-    DriverMode(-1, DriverModePipeline.class),
-    Reflective(0, ReflectivePipeline.class),
-    ColoredShape(1, ColoredShapePipeline.class);
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.photonvision.common.util.numbers.DoubleCouple;
+import org.photonvision.vision.processes.PipelineManager;
 
-    public final int baseIndex;
-    public final Class clazz;
+@JsonTypeName("PythonPipelineSettings")
+public class PythonPipelineSettings extends CVPipelineSettings {
+    public DoubleCouple offsetPoint = new DoubleCouple();
 
-    PipelineType(int baseIndex, Class clazz) {
-        this.baseIndex = baseIndex;
-        this.clazz = clazz;
+    public PythonPipelineSettings() {
+        super();
+        pipelineNickname = "Python Pipe";
+        pipelineIndex = PipelineManager.PYTHON_INDEX;
+        pipelineType = PipelineType.Python;
+        inputShouldShow = true;
     }
 }

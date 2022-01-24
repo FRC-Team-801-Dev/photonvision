@@ -15,21 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.photonvision.vision.pipeline;
+package org.photonvision.vision.pipeline.result;
 
-@SuppressWarnings("rawtypes")
-public enum PipelineType {
-    Python(-3, PythonPipeline.class),
-    Calib3d(-2, Calibrate3dPipeline.class),
-    DriverMode(-1, DriverModePipeline.class),
-    Reflective(0, ReflectivePipeline.class),
-    ColoredShape(1, ColoredShapePipeline.class);
+import java.util.List;
+import org.photonvision.vision.frame.Frame;
 
-    public final int baseIndex;
-    public final Class clazz;
-
-    PipelineType(int baseIndex, Class clazz) {
-        this.baseIndex = baseIndex;
-        this.clazz = clazz;
+public class PythonPipelineResult extends CVPipelineResult {
+    public PythonPipelineResult(double latencyNanos, double fps, Frame outputFrame) {
+        super(latencyNanos, fps, List.of(), outputFrame);
     }
 }
