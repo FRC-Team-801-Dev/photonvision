@@ -27,6 +27,7 @@ import org.photonvision.vision.opencv.CVMat;
 import org.photonvision.vision.pipe.impl.CalculateFPSPipe;
 import org.photonvision.vision.pipe.impl.Draw2dCrosshairPipe;
 import org.photonvision.vision.pipe.impl.ResizeImagePipe;
+import org.photonvision.vision.pipe.impl.PythonPipe;
 import org.photonvision.vision.pipe.impl.RotateImagePipe;
 import org.photonvision.vision.pipeline.result.DriverModePipelineResult;
 
@@ -36,6 +37,7 @@ public class DriverModePipeline
     private final Draw2dCrosshairPipe draw2dCrosshairPipe = new Draw2dCrosshairPipe();
     private final CalculateFPSPipe calculateFPSPipe = new CalculateFPSPipe();
     private final ResizeImagePipe resizeImagePipe = new ResizeImagePipe();
+    private final PythonPipe pythonPipe = new PythonPipe();
 
     public DriverModePipeline() {
         settings = new DriverModePipelineSettings();
@@ -52,6 +54,9 @@ public class DriverModePipeline
                         frameStaticProperties, settings.streamingFrameDivisor);
         draw2dCrosshairPipe.setParams(draw2dCrosshairParams);
 
+        pythonPipe.setParams(
+                new PythonPipe.PythonParams("moduleName"));
+        
         resizeImagePipe.setParams(
                 new ResizeImagePipe.ResizeImageParams(settings.streamingFrameDivisor));
 
@@ -76,6 +81,8 @@ public class DriverModePipeline
         }
 
         totalNanos += resizeImagePipe.run(inputMat).nanosElapsed;
+        
+        totalNanos += pythonPipe.run(inputMat).nanosElapsed;
 
         if (!accelerated) {
             var rotateImageResult = rotateImagePipe.run(inputMat);
