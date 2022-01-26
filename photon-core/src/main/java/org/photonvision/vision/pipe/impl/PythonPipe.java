@@ -60,13 +60,14 @@ public class PythonPipe extends MutatingPipe<Mat, PythonPipe.PythonParams> {
     protected Void process(Mat in) {
         if (pythonProcess == null) {
             try {
-                pythonProcess = new ProcessBuilder()
-                    .command("python", "python_pipe.py")
+                var pythonProcessBuilder = new ProcessBuilder()
+                    .command("python", "python_pipe.py", params.m_moduleName)
                     .redirectInput(ProcessBuilder.Redirect.PIPE)
                     .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectError(ProcessBuilder.Redirect.INHERIT)
-                    .start();
-                logger.info("A python process has been started");
+                    .redirectError(ProcessBuilder.Redirect.INHERIT);
+                
+                pythonProcess = pythonProcessBuilder.start();
+                logger.info("A python process has been started with the command: " + String.join(" ", pythonProcessBuilder.command()));
             } catch (IOException e) {
                 logger.error("Unable to start python process", e);
             }
@@ -110,7 +111,7 @@ public class PythonPipe extends MutatingPipe<Mat, PythonPipe.PythonParams> {
 
     public static class PythonParams {
         // Default PythonImagePrams with a no-op module.
-        public static PythonParams DEFAULT = new PythonParams("moduleName");
+        public static PythonParams DEFAULT = new PythonParams("default");
         
 
         // Member to store the name of the python module to run.

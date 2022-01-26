@@ -55,7 +55,7 @@ public class DriverModePipeline
         draw2dCrosshairPipe.setParams(draw2dCrosshairParams);
 
         pythonPipe.setParams(
-                new PythonPipe.PythonParams("moduleName"));
+                new PythonPipe.PythonParams("default"));
         
         resizeImagePipe.setParams(
                 new ResizeImagePipe.ResizeImageParams(settings.streamingFrameDivisor));
