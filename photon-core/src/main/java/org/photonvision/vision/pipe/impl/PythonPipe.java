@@ -16,6 +16,13 @@
  */
 package org.photonvision.vision.pipe.impl;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import javax.security.auth.login.LoginException;
+
+import org.eclipse.jetty.util.IO;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.photonvision.common.logging.LogGroup;
 import org.photonvision.common.logging.Logger;
@@ -25,6 +32,24 @@ import org.photonvision.vision.pipe.MutatingPipe;
 public class PythonPipe extends MutatingPipe<Mat, PythonPipe.PythonParams> {
     
     private static Logger logger = new Logger(PythonPipe.class, LogGroup.VisionModule);
+
+    static final String HEXES = "0123456789ABCDEF";
+
+    public static String getHex( byte [] raw ) {
+        if ( raw == null ) {
+            return null;
+        }
+        final StringBuilder hex = new StringBuilder( 2 * raw.length );
+        for ( final byte b : raw ) {
+            hex.append("\\x").append(HEXES.charAt((b & 0xF0) >> 4))
+                .append(HEXES.charAt((b & 0x0F)));
+        }
+
+        return hex.toString();
+    }
+    
+    private static Process pythonProcess;
+
     /**
      * Processes this pipe.
      *
@@ -33,7 +58,53 @@ public class PythonPipe extends MutatingPipe<Mat, PythonPipe.PythonParams> {
      */
     @Override
     protected Void process(Mat in) {
-        logger.debug("Pretend a python process in running");
+        if (pythonProcess == null) {
+            try {
+                pythonProcess = new ProcessBuilder()
+                    .command("python", "python_pipe.py")
+                    .redirectInput(ProcessBuilder.Redirect.PIPE)
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                    .redirectError(ProcessBuilder.Redirect.INHERIT)
+                    .start();
+                logger.info("A python process has been started");
+            } catch (IOException e) {
+                logger.error("Unable to start python process", e);
+            }
+        }
+
+        Mat img;
+        int inType = in.type();
+        
+        if (in.isContinuous()) {
+            img = in;
+        } else {
+            img = in.clone();
+        }
+
+        img.convertTo(img, CvType.CV_8UC(in.channels()));
+        
+        ByteBuffer shapeBuffer = ByteBuffer.allocate(12)
+            .putInt(in.height())
+            .putInt(in.width())
+            .putInt(in.channels());
+        
+        byte[] in_data = new byte[(int)(in.total() * in.channels())];
+        img.get(0, 0, in_data);
+        
+        try {
+            pythonProcess.getOutputStream().write(shapeBuffer.array());
+            pythonProcess.getOutputStream().write(in_data);
+            pythonProcess.getOutputStream().flush();
+
+            pythonProcess.getInputStream().read(in_data);
+        } catch (IOException e) {
+            logger.error("Unable to send image to python process.", e);
+            pythonProcess = null;
+        }
+
+        img.put(0, 0, in_data);
+        img.convertTo(in, inType);
+
         return null;
     }
 
