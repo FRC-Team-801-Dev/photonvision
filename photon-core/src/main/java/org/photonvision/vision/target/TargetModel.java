@@ -89,39 +89,7 @@ public enum TargetModel implements Releasable {
                 ),
             Units.inchesToMeters(0)
             ),
-//     k2022Ring(
-//             List.of(
-//                     tapePoint(-2, 0),
-//                     tapePoint(-2, 1),
-//                     tapePoint(-2, 2),
-//                     tapePoint(-2, 3),
-//                     tapePoint(-1, 0),
-//                     tapePoint(-1, 1),
-//                     tapePoint(-1, 2),
-//                     tapePoint(-1, 3),
-//                     tapePoint(0, 0),
-//                     tapePoint(0, 1),
-//                     tapePoint(0, 2),
-//                     tapePoint(0, 3),
-//                     tapePoint(1, 0),
-//                     tapePoint(1, 1),
-//                     tapePoint(1, 2),
-//                     tapePoint(1, 3)
-//             ),
-//             0) // 68in for firestation, 104in for real target
     ;
-
-    private static Point3 tapePoint(int tapeI, int cornerI) {
-        double r = 53.375 / 2;
-        double n = 16;
-        double tShift = Math.PI/2;
-        double theta = tShift + (tapeI * 2 * Math.PI / n) + (5 / (2*r)) * (cornerI % 2 == 0 ? -1 : 1) + Math.PI / n;
-        return new Point3(
-                Units.inchesToMeters(r * Math.cos(theta)),
-                Units.inchesToMeters(cornerI < 2 ? 1 : -1),
-                Units.inchesToMeters(r * Math.sin(theta))
-        );
-    }
 
     @JsonIgnore private MatOfPoint3f realWorldTargetCoordinates;
     @JsonIgnore private MatOfPoint3f visualizationBoxBottom = new MatOfPoint3f();
