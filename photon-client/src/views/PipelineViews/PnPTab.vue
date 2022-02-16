@@ -60,7 +60,7 @@
         },
         data() {
             return {
-                targetList: ['2020 High Goal Outer', '2020 High Goal Inner', '2019 Dual Target', 'Power Cell (7in)', '2016 High Goal', '2022 Ring Tape', '2022 Ring'], //Keep in sync with TargetModel.java
+                targetList: ['2020 High Goal Outer', '2020 High Goal Inner', '2019 Dual Target', 'Power Cell (7in)', '2016 High Goal', '2022 Ring Tape'], //Keep in sync with TargetModel.java
                 snackbar: {
                     color: "Success",
                     text: ""
