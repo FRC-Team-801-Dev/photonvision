@@ -92,6 +92,9 @@ public class SolvePNPPipe
 
         targetPose = correctLocationForCameraPitch(tVec, rVec, params.cameraPitchAngle);
 
+        Calib3d.undistortPoints(this.imagePoints, this.imagePoints, params.cameraCoefficients.getCameraIntrinsicsMat(), params.cameraCoefficients.getCameraExtrinsicsMat());
+
+        target.setCorners(this.imagePoints.toList());
         target.setCameraToTarget(targetPose);
     }
 
