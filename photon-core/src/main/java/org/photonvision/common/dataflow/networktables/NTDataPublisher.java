@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import org.opencv.core.Point;
 import org.photonvision.common.dataflow.CVPipelineResultConsumer;
 import org.photonvision.common.dataflow.structures.Packet;
+import org.photonvision.common.util.numbers.DoubleCouple;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
@@ -211,11 +212,22 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
     public static List<PhotonTrackedTarget> simpleFromTrackedTargets(List<TrackedTarget> targets) {
         var ret = new ArrayList<PhotonTrackedTarget>();
         for (var t : targets) {
-            var points = new Point[4];
-            t.getMinAreaRect().points(points);
+            var corners = t.getTargetCornersAngles();
+
+            if (corners == null) {
+                var points = new Point[4];
+                corners = new ArrayList<DoubleCouple>();
+                t.getMinAreaRect().points(points);
+                for (var point : points) {
+                    corners.add(new DoubleCouple(point.x, point.y));
+                }
+            }
             var cornerList = new ArrayList<TargetCorner>();
 
-            for (int i = 0; i < 4; i++) cornerList.add(new TargetCorner(points[i].x, points[i].y));
+            for (int i = 0; i < 4; i++) {
+                var corner = corners.get(i);
+                cornerList.add(new TargetCorner(corner.getFirst(), corner.getSecond()));
+            }
 
             ret.add(
                     new PhotonTrackedTarget(

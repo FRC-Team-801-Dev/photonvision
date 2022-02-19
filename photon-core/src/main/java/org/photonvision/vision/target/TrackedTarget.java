@@ -17,12 +17,15 @@
 package org.photonvision.vision.target;
 
 import edu.wpi.first.math.geometry.Transform2d;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.RotatedRect;
+import org.photonvision.common.util.numbers.DoubleCouple;
 import org.photonvision.vision.frame.FrameStaticProperties;
 import org.photonvision.vision.opencv.*;
 
@@ -37,6 +40,8 @@ public class TrackedTarget implements Releasable {
     private Point m_targetOffsetPoint;
     private Point m_robotOffsetPoint;
 
+    private List<DoubleCouple> m_targetCornersAngles;
+
     private double m_pitch;
     private double m_yaw;
     private double m_area;
@@ -47,12 +52,14 @@ public class TrackedTarget implements Releasable {
     private CVShape m_shape;
 
     private Mat m_cameraRelativeTvec, m_cameraRelativeRvec;
+    private TargetCalculationParameters m_params;
 
     public TrackedTarget(
             PotentialTarget origTarget, TargetCalculationParameters params, CVShape shape) {
         this.m_mainContour = origTarget.m_mainContour;
         this.m_subContours = origTarget.m_subContours;
         this.m_shape = shape;
+        this.m_params = params;
         calculateValues(params);
     }
 
@@ -134,11 +141,31 @@ public class TrackedTarget implements Releasable {
     }
 
     public void setCorners(List<Point> targetCorners) {
+        if (targetCorners == null) {
+            m_targetCorners = null;
+            m_targetCornersAngles = null;
+            return;
+        }
+        
+        List<DoubleCouple> targetCornerAngles = new ArrayList<DoubleCouple>();
+
+        for (int i =  0; i < targetCorners.size(); i++) {
+            targetCornerAngles.add(new DoubleCouple(
+                TargetCalculations.calculatePitch(targetCorners.get(i).y, m_robotOffsetPoint.y, m_params.verticalFocalLength),
+                TargetCalculations.calculateYaw(targetCorners.get(i).x, m_robotOffsetPoint.x, m_params.horizontalFocalLength)
+            ));
+        }
+
+        this.m_targetCornersAngles = targetCornerAngles;
         this.m_targetCorners = targetCorners;
     }
 
     public List<Point> getTargetCorners() {
         return m_targetCorners;
+    }
+    
+    public List<DoubleCouple> getTargetCornersAngles() {
+        return m_targetCornersAngles;
     }
 
     public boolean hasSubContours() {

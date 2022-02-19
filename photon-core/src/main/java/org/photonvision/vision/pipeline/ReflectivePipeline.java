@@ -201,18 +201,18 @@ public class ReflectivePipeline extends CVPipeline<CVPipelineResult, ReflectiveP
 
         List<TrackedTarget> targetList;
 
+        var cornerDetectionResult = cornerDetectionPipe.run(collect2dTargetsResult.output);
+        sumPipeNanosElapsed += pipeProfileNanos[8] = cornerDetectionResult.nanosElapsed;
+
         // 3d stuff
         if (settings.solvePNPEnabled) {
-            var cornerDetectionResult = cornerDetectionPipe.run(collect2dTargetsResult.output);
-            sumPipeNanosElapsed += pipeProfileNanos[8] = cornerDetectionResult.nanosElapsed;
-
             var solvePNPResult = solvePNPPipe.run(cornerDetectionResult.output);
             sumPipeNanosElapsed += pipeProfileNanos[9] = solvePNPResult.nanosElapsed;
 
             targetList = solvePNPResult.output;
         } else {
-            pipeProfileNanos[8] = 0;
             pipeProfileNanos[9] = 0;
+            
             targetList = collect2dTargetsResult.output;
         }
 
