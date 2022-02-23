@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -212,21 +213,19 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
     public static List<PhotonTrackedTarget> simpleFromTrackedTargets(List<TrackedTarget> targets) {
         var ret = new ArrayList<PhotonTrackedTarget>();
         for (var t : targets) {
-            var corners = t.getTargetCornersAngles();
+            var points = new Point[4];
+            List<DoubleCouple> cornersAngles = new ArrayList<DoubleCouple>();
+            t.getMinAreaRect().points(points);
+            t.setCorners(Arrays.asList(points));
+            var corners = t.getTargetCorners();
+            cornersAngles = t.getTargetCornersAngles();
 
-            if (corners == null) {
-                var points = new Point[4];
-                corners = new ArrayList<DoubleCouple>();
-                t.getMinAreaRect().points(points);
-                for (var point : points) {
-                    corners.add(new DoubleCouple(point.x, point.y));
-                }
-            }
             var cornerList = new ArrayList<TargetCorner>();
 
             for (int i = 0; i < 4; i++) {
                 var corner = corners.get(i);
-                cornerList.add(new TargetCorner(corner.getFirst(), corner.getSecond()));
+                var cornerAngles = cornersAngles.get(i);
+                cornerList.add(new TargetCorner(corner.x, corner.y, cornerAngles.getFirst(), cornerAngles.getSecond()));
             }
 
             ret.add(
