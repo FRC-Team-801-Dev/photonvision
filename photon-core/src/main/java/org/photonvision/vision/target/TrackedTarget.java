@@ -151,8 +151,8 @@ public class TrackedTarget implements Releasable {
 
         for (int i =  0; i < targetCorners.size(); i++) {
             targetCornerAngles.add(new DoubleCouple(
-                TargetCalculations.calculatePitch(targetCorners.get(i).y, m_robotOffsetPoint.y, m_params.verticalFocalLength),
-                TargetCalculations.calculateYaw(targetCorners.get(i).x, m_robotOffsetPoint.x, m_params.horizontalFocalLength)
+                TargetCalculations.calculateYaw(targetCorners.get(i).x, m_robotOffsetPoint.x, m_params.horizontalFocalLength),
+                TargetCalculations.calculatePitch(targetCorners.get(i).y, m_robotOffsetPoint.y, m_params.verticalFocalLength)
             ));
         }
 

@@ -23,12 +23,20 @@ import java.util.Objects;
  * Origin at the top left, plus-x to the right, plus-y down.
  */
 public class TargetCorner {
+    public final double yaw;
+    public final double pitch;
     public final double x;
     public final double y;
 
     public TargetCorner(double cx, double cy) {
+        this(cx, cy, 0, 0);
+    }
+
+    public TargetCorner(double cx, double cy, double yaw, double pitch) {
         this.x = cx;
         this.y = cy;
+        this.yaw = yaw;
+        this.pitch = pitch;
     }
 
     @Override
@@ -36,16 +44,19 @@ public class TargetCorner {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TargetCorner that = (TargetCorner) o;
-        return Double.compare(that.x, x) == 0 && Double.compare(that.y, y) == 0;
+        return Double.compare(that.x, x) == 0 &&
+            Double.compare(that.y, y) == 0 && 
+            Double.compare(this.yaw, yaw) == 0 &&
+            Double.compare(this.pitch, pitch) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return Objects.hash(x, y, yaw, pitch);
     }
 
     @Override
     public String toString() {
-        return "(" + x + "," + y + ')';
+        return "(" + x + "," + y + ") | yaw: " + yaw + " pitch: " + pitch;
     }
 }

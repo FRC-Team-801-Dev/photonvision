@@ -25,7 +25,7 @@ import java.util.Objects;
 import org.photonvision.common.dataflow.structures.Packet;
 
 public class PhotonTrackedTarget {
-    public static final int PACK_SIZE_BYTES = Double.BYTES * (7 + 2 * 4);
+    public static final int PACK_SIZE_BYTES = Double.BYTES * (7 + 4 * 4);
 
     private double yaw;
     private double pitch;
@@ -118,7 +118,9 @@ public class PhotonTrackedTarget {
         for (int i = 0; i < 4; i++) {
             double cx = packet.decodeDouble();
             double cy = packet.decodeDouble();
-            targetCorners.add(new TargetCorner(cx, cy));
+            double yaw = packet.decodeDouble();
+            double pitch = packet.decodeDouble();
+            targetCorners.add(new TargetCorner(cx, cy, pitch, yaw));
         }
 
         this.cameraToTarget = new Transform2d(new Translation2d(x, y), Rotation2d.fromDegrees(r));
@@ -144,6 +146,8 @@ public class PhotonTrackedTarget {
         for (int i = 0; i < 4; i++) {
             packet.encode(targetCorners.get(i).x);
             packet.encode(targetCorners.get(i).y);
+            packet.encode(targetCorners.get(i).yaw);
+            packet.encode(targetCorners.get(i).pitch);
         }
 
         return packet;
